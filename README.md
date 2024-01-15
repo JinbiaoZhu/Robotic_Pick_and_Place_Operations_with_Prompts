@@ -2,6 +2,11 @@
 
 The implementation of the paper "**Enhancing home service robot system: Leveraging foundation models to pick-place objects guided by human natural language queries**".
 
+<p align="center">
+<img src="https://github.com/JinbiaoZhu/Robotic_Pick_and_Place_Operations_with_Prompts/blob/main/assets/simluation_00.png?raw=true" 
+  alt="image" width="450" height="auto">
+</p>
+
 ## Preparation
 
 1. System: Ubuntu 20.04
