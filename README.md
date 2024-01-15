@@ -27,24 +27,26 @@ conda activate pickplace
 ### Install Coppeliasim
 
 1. Go to the Coppeliasim downloading [website](https://www.coppeliarobotics.com/previousVersions).
-2. Download `CoppeliaSim Player, Ubuntu 20.04`. It should be a `.tar.xz` file.
+2. Download `CoppeliaSim Player, Ubuntu 20.04` file. It should be a `.tar.xz` file.
 3. Extract the `.tar.xz` file to `/home/your-account/`.
 
 ### Clone the repository
 
+Launch a new terminal to clone this repository.
 ```
+cd ~
 git clone https://github.com/JinbiaoZhu/Robotic_Pick_and_Place_Operations_with_Prompts.git
 ```
 
 ### Download Coppeliasim scene
 
 1. Download [this file](https://drive.google.com/file/d/1FxXkRcFUu9Og7UsbsiMjtfF2nxXHiBzY/view?usp=drive_link) (`PickPlaceScene.ttt`) from Google drive.
-2. Move this file to `Robotic_Pick_and_Place_Operations_with_Prompts` directory.
+2. Move this file to `/home/your-account/Robotic_Pick_and_Place_Operations_with_Prompts/` directory.
 
 ### Download the vision models
 
 1. Download [this file](https://drive.google.com/file/d/1HPY5hxVC7AE3T9ZJIcK-gisoQOLEkyFf/view?usp=drive_link) (`used_owlvit_sam.tar.xz`) from Google drive.
-2. Extract the `used_owlvit_sam.tar.xz` file to `Robotic_Pick_and_Place_Operations_with_Prompts` directory.
+2. Extract the `used_owlvit_sam.tar.xz` file to `/home/your-account/Robotic_Pick_and_Place_Operations_with_Prompts/` directory.
 
 ## Configuration
 
@@ -53,7 +55,7 @@ git clone https://github.com/JinbiaoZhu/Robotic_Pick_and_Place_Operations_with_P
 ```
 conda activate pickplace
 cd Robotic_Pick_and_Place_Operations_with_Prompts
-pip install -r requirements.txtsave 
+pip install -r requirements.txt
 ```
 
 ### Enter Coppeliasim and load PickAndPlace.ttt scene
