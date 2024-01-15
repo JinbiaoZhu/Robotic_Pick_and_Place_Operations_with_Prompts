@@ -18,6 +18,8 @@ The implementation of the paper "**Enhancing home service robot system: Leveragi
 
 ### Create conda environment
 
+Launch a new terminal.
+
 ```
 conda activate
 conda create -n pickplace python==3.10.0
