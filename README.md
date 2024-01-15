@@ -51,7 +51,7 @@ cd Robotic_Pick_and_Place_Operations_with_Prompts
 pip install -r requirements.txtsave 
 ```
 
-### Enter Coppeliasim and load `PickAndPlace.ttt` scene
+### Enter Coppeliasim and load PickAndPlace.ttt scene
 
 Launch another terminal to enter Coppeliasim.
 
