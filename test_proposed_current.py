@@ -22,7 +22,7 @@ from langchain.prompts.prompt import PromptTemplate
 from langchain.tools import Tool
 
 from global_parameters import GlobalParam
-from m1509 import M1509v2
+from m1509 import Robot
 from sim import *
 
 os.environ["OPENAI_API_KEY"] = GlobalParam.OPENAI_API_KEY_for_Agent
