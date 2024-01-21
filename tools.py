@@ -1,5 +1,5 @@
 """
-Description: The abstract class about basic tools of a robot.
+Description: Basic tools of this project.
 Editor: Jinbiao Zhu
 Date: 19-10-2024
 """
