@@ -17,7 +17,7 @@ from toolset import *
 from utils.tools import get_current_date_and_time
 
 
-class M1509v2(Skills, Tools):
+class Robot(Skills, Tools):
     def __init__(self):
         """
         Connect to a running Coppeliasim simulation environment.
