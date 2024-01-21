@@ -1,7 +1,7 @@
 """
 Description: The main code for running.
 Editor: Jinbiao Zhu
-Date: 19-10-2024
+Date: 19-01-2024
 """
 import datetime
 import json
@@ -28,7 +28,7 @@ from sim import *
 os.environ["OPENAI_API_KEY"] = GlobalParam.OPENAI_API_KEY_for_Agent
 
 running_info = dict()
-robot = M1509v2()
+robot = Robot()
 
 
 def generate_scenario_description(name: str):
@@ -36,13 +36,13 @@ def generate_scenario_description(name: str):
         " with an orange, a banana, a computer mouse, a clock, a bleach, a water bottle, and a food can on it."
 
 
-class AnalyzeHumanIntention:
+class IntentAnalysis:
     def __init__(self):
         self.llm = OpenAI(model_name=GlobalParam.OpenAI_chat_model,
                           temperature=GlobalParam.Default_temperature,
                           max_tokens=GlobalParam.Default_max_tokens)
         self.text = """
-Please play the role of an excellent human-query analyzer. I am Alice, a human, and I will tell you my query.
+Please play the role of an excellent human query analyzer. I am Alice, a human, and I will tell you my query.
 Please analyze my query and select the most suitable single or multiple objects based on the actual scenario.
 The actual scenario you are in: {scenario_description}
 Please answer in the format of string.
@@ -62,25 +62,26 @@ Answer:
     def run(self, user_input: str) -> str:
         full_prompt = self.template.format(query=user_input,
                                            scenario_description=generate_scenario_description("you"))
-        print(full_prompt)
+        # print(full_prompt)
         response = self.llm(full_prompt)
         running_info["query"] = user_input
         running_info["intentions"] = response
         return response
 
 
-class GenerateCodeChain:
+class BehaviorGeneration:
     def __init__(self):
         self.llm = OpenAI(model_name=GlobalParam.OpenAI_chat_model,
                           temperature=GlobalParam.Default_temperature,
                           max_tokens=GlobalParam.Default_max_tokens)
         self.prompt_template_text = """
 You will play the role of an excellent Python programmer.
+{scenario_description}
 You will generate the Python-based robot control codes for a 6 degree-of-freedom DOOSAN M1509 robotic arm with a gripper
 based on the task provided.
 You must use the following pieces of abstract class to complete the code. 
 ----------------------------------------------
-class M1509:
+class Robot:
     def __init__(self):
         # Function:
         #     This method realizes the initialization of the robot and the perceptual system.
@@ -215,7 +216,6 @@ answer:```python
     robot.grasp(False)  # release the cup
     robot.home()```
 ----------------------------------------------\n
-{scenario_description}
 Attention: You only need to output the code.
 Let's begin!
 task: {userInput}
@@ -232,36 +232,27 @@ answer:
         return code
 
 
-# Behavior Self-correction
-class BehaviorSelfCorrection:
+class BehaviorSelfcorrection:
     def __init__(self):
         self._llm = OpenAI(model_name=GlobalParam.OpenAI_chat_model,
                            temperature=0.0,
                            max_tokens=GlobalParam.Default_max_tokens)
         prompt_template_text = """
 You will play the role of an excellent Python code reviewer. 
+{scenario_description}
 You will check the Python robot control codes for a 6 degree-of-freedom robotic arm, DOOSAN M1509 with a gripper. 
 Please check the codes based on known facts, the checkpoints. If you check the codes meet the known facts and the
 checkpoints, please provide positive comments. On the other hand, if you check the codes doesn't meet the known facts
 or the checkpoints, please provide negative comments.
 ----------------------------------------------
 The known facts are that: 
-In front of the DOOSAN M1509 robot, {scenario_description}. 
 The DOOSAN M1509 robot will be serving Alice.
 
 The checkpoints list as below: 
-1. The code must start with 'robot.M1509()'; 
-2. When the class initialization is completed and the task execution is finished, 'robot.home()' is needed to ensure that 
-the robot returns to its initial position. 
-3. Before executing methods that cause changes in the position and posture of the robotic arm's end effector and gripper, 
-'robot.observe()' must be used for the acquisition of environment information. 
-4. When the robotic arm's end effector and gripper approach an object, horizontal movements should be executed before 
-vertical movements. Fuzzy or ambiguous object vocabulary is also acceptable.
-5. When the robot transitions from manipulating one object to manipulating another object, the gripper must be released,
-using the code, 'robot.grasp(False)'.
-6. When a robot completes a grasping and needs to perform a movement action, it must first return to the home position 
-like 'robot.home()' after completing the grasping action before proceeding with the movement action. This is done for 
-safety reasons.
+1. If codes exist, the codes must start with 'robot.Robot()'; 
+2. If the codes running is completed and the task execution is finished, 'robot.home()' is needed to ensure that the robot returns to its initial position. 
+3. If the robotic arm's end effector and gripper approach an object, horizontal movements should be executed before vertical movements. 
+4. If the robot transitions from manipulating one object to manipulating another object, the gripper must be released, using 'robot.grasp(False)'. 
 ----------------------------------------------
 ATTENTION: Please generate the comments as short as possible, just a single sentence!!!
 ----------------------------------------------
@@ -286,19 +277,21 @@ comments:
         return comments
 
 
-# Execute the code
 class ExecuteCodeChain:
     def __init__(self):
         pass
 
     def run(self, code: str) -> str:
         code_file = running_info["code"]
-        # 使用正则表达式提取Python代码
+        # Extract Python code using regular expressions
         pattern = r"robot\.[a-zA-Z_]+\([^)]*\)"
-        # 使用findall函数提取匹配的代码片段
+        
+        # Use the findall function to extract the matching code snippet
         matches = re.findall(pattern, code_file)
-        # 打印并执行提取的结构化代码
+        
+        # Print and execute the extracted structured code
         show_buffer, string_to_print = '', ''
+        
         print("Start to run the code in Robot Coppeliasim...")
 
         show_buffer += ("Generating robot control codes..." + "<br>")
@@ -314,7 +307,7 @@ class ExecuteCodeChain:
             simxSetIntegerSignal(robot.clientID, "flag", 1, simx_opmode_blocking)
             simxSetStringSignal(robot.clientID, "response", show_buffer, simx_opmode_blocking)
 
-            eval(code)  # 执行
+            eval(code)  # execute
 
             time.sleep(0.1)
             if i == len(matches) - 1:
@@ -371,27 +364,27 @@ class CustomOutputParser(AgentOutputParser):
         return AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
 
 
-AnalyzeIntention = AnalyzeHumanIntention()
-GenerateCode = GenerateCodeChain()
-InspectCode = BehaviorSelfCorrection()
-ExecuteCode = ExecuteCodeChain()
+IntentAnalysis = IntentAnalysis()
+BehaviorGeneration = BehaviorGeneration()
+BehaviorSelfcorrection = BehaviorSelfcorrection()
+ExecuteCodeChain = ExecuteCodeChain()
 
 tools = [
     Tool(
         name="Analyze-Human-Intention-Tool",
-        func=AnalyzeIntention.run,
+        func=IntentAnalysis.run,
         description="This tool can help you analyze human intentions and allow you to observe string-format analysis "
                     "results. You just need to input human query into the tool."
     ),
     Tool(
         name="Generate-Code-Tool",
-        func=GenerateCode.run,
+        func=BehaviorGeneration.run,
         description="This tool can help you generate Python-based robot control codes and allow you to observe Python "
                     "codes in markdown format. You just need to input the task into the tool."
     ),
     Tool(
         name="Inspect-Code-Tool",
-        func=InspectCode.run,
+        func=BehaviorSelfcorrection.run,
         description="This tool will help you check whether the codes meet the current situation and comply with the "
                     "specified syntax rules. This tool allows you to observe its generated comments on the codes."
                     "You just need to input the codes into the tool."
