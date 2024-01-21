@@ -10,7 +10,7 @@ class Skills:
     def __init__(self):
         pass
 
-    def kill(self):
+    def home(self):
         pass
 
     def move_horizontally(self, object_name):
