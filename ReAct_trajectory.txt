@@ -1,0 +1,6 @@
+Thought: The human is looking to add some flavor to their cooking. I need to understand what they mean by "zest" and how I can assist with that.
+Action: Intent Analysis
+Action Input: "zest"
+Observation: Give Alice an orange.
+Thought: The human is referring to adding citrus flavor to their cooking. I can assist by providing an orange.
+Final Answer: You can add some zest to your cooking by using the orange.
